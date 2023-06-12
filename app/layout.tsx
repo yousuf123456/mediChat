@@ -1,4 +1,3 @@
-"use client";
 
 import { ActiveStatus } from './context/ActiveStatus';
 import { SessionContext } from './context/SessionContext'
