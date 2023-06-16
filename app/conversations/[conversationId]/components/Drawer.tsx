@@ -16,7 +16,6 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
-    AlertDialogTrigger,
  } from "../../../../components/ui/alert-dialog"
 
 import { useOtherUser } from "@/app/hooks/useOtherUser";
@@ -25,7 +24,6 @@ import { useMemo, useState } from "react";
 import { MembersList } from "./MembersList";
 import axios from "axios";
 import useConversation from "@/app/hooks/useConversation";
-import { Button } from "@/components/ui/button";
 import { LoadingButton } from "@/app/components/LoadingButton";
 import { toast } from "react-hot-toast";
 import clsx from "clsx";
@@ -157,7 +155,7 @@ export function Drawer({ conversation } : DrawerProps) {
                     <AlertDialogHeader>
                     <AlertDialogTitle className="bg-indigo-950 text-white py-2 px-6 rounded-bl-2xl rounded-br-2xl">Delete User</AlertDialogTitle>
                     <AlertDialogDescription className="px-6 pt-6">
-                        This action cannot be undone! This will completely remove your's conversation with this user. Do you want to delete this user ?
+                        This action cannot be undone! This will completely remove your&apos;s conversation with this user. Do you want to delete this user ?
                     </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter className="px-6 mt-4">
