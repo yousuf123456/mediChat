@@ -32,7 +32,7 @@ export const Header : React.FC<HeaderProps> = ( { conversation } ) => {
     }
 
     return isActive ? "Active" : "offline"
-  }, [conversation.users, isActive])
+  }, [conversation, isActive])
 
   return (
     <div className='flex flex-row justify-between items-center py-3 px-3 sm:px-6 border-b-2 border-neutral-300'>

@@ -56,7 +56,7 @@ export const Select = ( {users,
         if (searchedUserName) {
             setClosestUser(UserSearch(users, searchedUserName))
         }
-    }, [searchedUserName])
+    }, [searchedUserName, users])
 
   return (
     <Listbox disabled={disabled} value={selectedUsers} onChange={setSelectedUsers} multiple>
@@ -67,7 +67,7 @@ export const Select = ( {users,
 
                     {selectedUsers.map((person : User, index) => {
                         return (
-                            <div className='px-2 py-2 flex gap-2 items-center bg-blue-100 rounded-sm'>
+                            <div key={index} className='px-2 py-2 flex gap-2 items-center bg-blue-100 rounded-sm'>
                                 <h3 className='text-xs font-normal text-indigo-950'>
                                     { person.name }
                                 </h3>
