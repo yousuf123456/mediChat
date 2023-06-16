@@ -1,4 +1,3 @@
-import { data } from 'autoprefixer';
 
 import { getCurrentUser } from "@/app/actions/getCurrentUser";
 import prisma from "../../libs/prismadb"
@@ -7,10 +6,7 @@ import { pusherServer } from "@/app/libs/pusher";
 import { User } from "@prisma/client";
 import { find } from "lodash";
 import { messaging } from './firebase-admin';
-import { useActiveList } from "@/app/hooks/useActiveList";
-// import { useActiveList } from "@/app/hooks/useActiveList";
 
-// import { getMessaging } from "firebase/app"
 
 export async function POST(request: Request) {
     try {
@@ -108,37 +104,25 @@ export async function POST(request: Request) {
             });      
         });
 
-        const Message = {
-            data : {
-                title : `${currentUser.name}`,
-                body : createdMessage?.body!,
-                icon : currentUser?.image!,
-                conId : updatedConversation.id   
-            },
-
-            token : currentUser?.deviceToken!
-        }
-
-        messaging.send(Message)
-        // updatedConversation.users.map((user) => {
-        //     if (user.name !== createdMessage.sender.name) {
-        //         if (user.notificationPermission) {
-        //             if (user.deviceToken) {
-        //                 const Message = {
-        //                     data : {
-        //                         title : `${createdMessage.sender.name}`,
-        //                         body : createdMessage?.body! || "Sent an image.",
-        //                         icon : createdMessage?.sender?.image!,   
-        //                     },
+        updatedConversation.users.map((user) => {
+            if (user.name !== createdMessage.sender.name) {
+                if (user.notificationPermission) {
+                    if (user.deviceToken) {
+                        const Message = {
+                            data : {
+                                title : `${createdMessage.sender.name}`,
+                                body : createdMessage?.body! || "Sent an image.",
+                                icon : createdMessage?.sender?.image!,   
+                            },
                 
-        //                     token : currentUser?.deviceToken!
-        //                 }
+                            token : currentUser?.deviceToken!
+                        }
                       
-        //                 messaging.send(Message);
-        //             }   
-        //         }
-        //     }
-        // })
+                        messaging.send(Message);
+                    }   
+                }
+            }
+        })
 
         return NextResponse.json(createdMessage)
     }
