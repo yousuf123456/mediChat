@@ -32,7 +32,7 @@ export const ConversationBox : React.FC<conversationBoxProps> = ({
 
     const handleClick = useCallback(() => {
         router.push(`/conversations/${item.id}`)
-    }, [router])
+    }, [router, item.id])
 
 
     const lastMessage = useMemo(() => {

@@ -58,7 +58,7 @@ export function Drawer({ conversation } : DrawerProps) {
         }
 
         return conversation.users.length + " members"
-    }, [conversation])
+    }, [conversation, isActive])
 
     const { conversationId } = useConversation();
     

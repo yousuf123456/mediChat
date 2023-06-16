@@ -14,7 +14,7 @@ export const MembersList: React.FC<MembersListProps> = ({ conversation }) => {
         {
             conversation.users.map((user) => {
                 return (
-                    <MemberBox user={user}/>
+                    <MemberBox user={user} key={user.id}/>
                 )
             })
         }

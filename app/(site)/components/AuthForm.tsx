@@ -29,7 +29,7 @@ function AuthForm ( {setCurrentForm}  : AuthFormProps ) {
       if (status === "authenticated") {
         router.push("/conversations");
       }
-    }, [status])
+    }, [status, router])
 
     
     const [variants, setVariants] = useState<Variants>("LOGIN");

@@ -45,7 +45,7 @@ export function AddUserModel(){
             toast.error("Something went wrong !");
         })
         .finally(()=>setIsLoading(false))
-    }, [])
+    }, [router])
 
     const { register, handleSubmit, setValue, formState : {errors} } = useForm();
 

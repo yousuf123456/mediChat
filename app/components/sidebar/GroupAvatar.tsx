@@ -14,7 +14,7 @@ export const GroupAvatar = ({ users, size }: Props) => {
         {
             users.map((user)=>{
                 return (
-                    <div className={clsx('relative rounded-full overflow-hidden', size)}>
+                    <div key={user.id} className={clsx('relative rounded-full overflow-hidden', size)}>
                         <Avatar user={user} />
                     </div>
                 )

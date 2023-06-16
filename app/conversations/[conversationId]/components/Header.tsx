@@ -32,7 +32,7 @@ export const Header : React.FC<HeaderProps> = ( { conversation } ) => {
     }
 
     return isActive ? "Active" : "offline"
-  }, [conversation.users])
+  }, [conversation.users, isActive])
 
   return (
     <div className='flex flex-row justify-between items-center py-3 px-3 sm:px-6 border-b-2 border-neutral-300'>
@@ -72,12 +72,12 @@ export const Header : React.FC<HeaderProps> = ( { conversation } ) => {
                     conversation.users.map((user, index)=>{
                       if (index < 5)
                       return (
-                        <div key={user.id} className='w-5 h-5 relative rounded-full overflow-hidden'>
+                        <div key={index} className='w-5 h-5 relative rounded-full overflow-hidden'>
                           <Avatar user={user}/>
                         </div>
                       )
                       else {
-                        return <p className='text-black text-2xl'>.</p>
+                        return <div key={index}><p className='text-black text-2xl'>.</p></div>
                       }
                     })
                   }
