@@ -4,7 +4,7 @@ import {useActiveList} from "./useActiveList"
 import { Channel, Members } from "pusher-js";
 import { pusherClient, pusherServer } from "../libs/pusher";
 
-export default function useActiveChannel(){
+const useActiveChannel = ()=>{
     const { add, remove, set } = useActiveList();
     const [activeChannel, setActiveChannel] = useState<Channel | null>(null);
 
@@ -37,3 +37,5 @@ export default function useActiveChannel(){
         }
     }, [add, remove, set, activeChannel]);
 }
+
+export default useActiveChannel

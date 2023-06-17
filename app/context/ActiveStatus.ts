@@ -1,3 +1,4 @@
+"use client"
 import useActiveChannel from "../hooks/useActiveChannel"
 
 export const ActiveStatus = () => {
