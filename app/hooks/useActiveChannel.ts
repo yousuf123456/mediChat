@@ -1,4 +1,4 @@
-"use client";
+
 import { useEffect, useState } from "react";
 import {useActiveList} from "./useActiveList"
 import { Channel, Members } from "pusher-js";
@@ -36,10 +36,4 @@ export default function useActiveChannel(){
             }
         }
     }, [add, remove, set, activeChannel]);
-
-
-
-    if (!activeChannel) {
-
-    }
 }
