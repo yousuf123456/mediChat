@@ -18,5 +18,5 @@ export default async function handler(req : NextApiRequest, res : NextApiRespons
 
     const auth_response = pusherServer.authorizeChannel(socketId, channel, data);
 
-    res.send(auth_response);
+    return res.send(auth_response);
 }
