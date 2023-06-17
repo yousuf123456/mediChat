@@ -66,7 +66,7 @@ export function AddUserModel(){
     <BsPlus onClick={()=>setOpen(true)} className='w-6 h-6 text-indigo-950'/>
     <ConfirmationDialog modifyTrigger={false} title='Add New User' open={open} setOpen={setOpen}>
         <h2 className='mt-4 text-base sm:text-lg font-medium text-indigo-950'>
-            Search user by his Email or Id
+            Search user by his Email or Id.
         </h2>
 
         <form onSubmit={handleSubmit(searchUser)}>
