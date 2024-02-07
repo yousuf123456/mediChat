@@ -1,41 +1,43 @@
-
 import { useEffect, useState } from "react";
-import {useActiveList} from "./useActiveList"
+import { useActiveList } from "./useActiveList";
 import { Channel, Members } from "pusher-js";
-import { pusherClient, pusherServer } from "../libs/pusher";
+import { pusherClient } from "../libs/pusher";
 
-const useActiveChannel = ()=>{
-    const { add, remove, set } = useActiveList();
-    const [activeChannel, setActiveChannel] = useState<Channel | null>(null);
+const useActiveChannel = () => {
+  const { add, remove, set } = useActiveList();
+  const [activeChannel, setActiveChannel] = useState<Channel | null>(null);
 
-    useEffect(()=>{
-        let channel = activeChannel
-        if (!channel) {
-            channel = pusherClient.subscribe("presence-mediChat");
-        }
+  useEffect(() => {
+    let channel = activeChannel;
 
-        channel.bind("pusher:subscription_succeeded", (members : Members)=>{
-            const initialMembers : string[] = []
+    if (!channel) {
+      channel = pusherClient.subscribe("presence-chatVibe");
+    }
 
-            members.each((member : Record<string, any>) => initialMembers.push(member.id));
-            set(initialMembers);
-        });
+    channel.bind("pusher:subscription_succeeded", (members: Members) => {
+      const initialMembers: string[] = [];
 
-        channel.bind("pusher:member_added", (member : Record<string, any>) => {
-            add(member.id)
-        })
+      members.each((member: Record<string, any>) =>
+        initialMembers.push(member.id)
+      );
+      set(initialMembers);
+    });
 
-        channel.bind("pusher:member_removed", ( member : Record<string, any> ) => {
-            remove(member.id)
-        });
+    channel.bind("pusher:member_added", (member: Record<string, any>) => {
+      add(member.id);
+    });
 
-        return ()=>{
-            if (activeChannel) {
-                pusherClient.unsubscribe("presence-mediChat");
-                setActiveChannel(null);
-            }
-        }
-    }, [add, remove, set, activeChannel]);
-}
+    channel.bind("pusher:member_removed", (member: Record<string, any>) => {
+      remove(member.id);
+    });
 
-export default useActiveChannel
+    return () => {
+      if (activeChannel) {
+        pusherClient.unsubscribe("presence-chatVibe");
+        setActiveChannel(null);
+      }
+    };
+  }, [add, remove, set, activeChannel]);
+};
+
+export default useActiveChannel;

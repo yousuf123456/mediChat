@@ -51,6 +51,7 @@ model Account {
   @@unique([provider, providerAccountId])
 }
 
+
 model Conversation {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   createdAt DateTime @default(now())
