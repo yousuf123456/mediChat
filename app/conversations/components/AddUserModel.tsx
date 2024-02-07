@@ -1,6 +1,6 @@
 "use client";
 import axios from "axios";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { User } from "@prisma/client";
 import { useRouter } from "next/navigation";
 
@@ -8,18 +8,18 @@ import { DialogFooter } from "../../../components/ui/dialog";
 
 import { ConfirmationDialog } from "@/components/Dialog";
 import { BsPlus } from "react-icons/bs";
-import clsx from "clsx";
-import { Button } from "@/components/ui/button";
 import { Avatar } from "@/app/components/sidebar/Avatar";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
-import { Input } from "@/app/components/inputs/Input";
-import { DialogClose } from "@radix-ui/react-dialog";
 import { LoadingButton } from "@/app/components/LoadingButton";
 import { toast } from "react-hot-toast";
+import { Input } from "@/components/ui/input";
 
 export function AddUserModel() {
-  const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [autocompletes, setAutocompletes] = useState<{ email: string }[]>([]);
+  const [open2, setOpen2] = useState(false);
 
   const [user, setUser] = useState<User | null>();
   const router = useRouter();
@@ -49,12 +49,22 @@ export function AddUserModel() {
     [router]
   );
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm();
+  const { register, handleSubmit, setValue, watch } = useForm();
+
+  const email_id = watch("email_id");
+
+  useEffect(() => {
+    if (!email_id) return;
+
+    axios
+      .post("../../api/getEmailAutocompletes", { email: email_id })
+      .then((res) => setAutocompletes(res.data))
+      .catch((e) => console.log(e));
+  }, [email_id]);
+
+  const onAutocompleteClick = (value: string) => {
+    setValue("email_id", value);
+  };
 
   const searchUser: SubmitHandler<FieldValues> = (data) => {
     setIsLoading(true);
@@ -82,27 +92,54 @@ export function AddUserModel() {
         open={open}
         setOpen={setOpen}
       >
-        <h2 className="mt-4 text-base sm:text-lg font-medium text-indigo-950">
-          Search user by his Email or Id.
-        </h2>
-
         <form onSubmit={handleSubmit(searchUser)}>
-          <Input
-            type="text"
-            required={true}
-            disabled={isLoading}
-            register={register}
-            id="email_id"
-            placeholder="Type user email or id"
-          />
-          <LoadingButton
-            className="mt-2"
-            type="submit"
-            isLoading={isLoading}
-            disabled={isLoading}
-          >
-            Search
-          </LoadingButton>
+          <div className="flex flex-col gap-2">
+            <h2 className="mt-4 text-base font-roboto text-start font-medium text-indigo-950">
+              Search user by his Email or Id.
+            </h2>
+
+            <div className="relative">
+              <Input
+                autoComplete="off"
+                {...register("email_id", { required: true })}
+                type="text"
+                required={true}
+                disabled={isLoading}
+                onFocus={(e) => setOpen2(true)}
+                onBlur={(e) =>
+                  setTimeout(() => {
+                    setOpen2(false);
+                  }, 500)
+                }
+                placeholder="Type user email or id"
+              />
+
+              {open2 && autocompletes.length > 0 && (
+                <div className="absolute flex flex-col items-start gap-0 p-1 top-12 left-0 right-0 h-44 overflow-y-auto bg-white shadow-lg rounded-md z-[99999]">
+                  {autocompletes.map((autoComplete, i) => (
+                    <div
+                      key={i}
+                      onClick={() => onAutocompleteClick(autoComplete.email)}
+                      className="px-4 py-2 rounded-sm hover:bg-neutral-100 w-full flex justify-start"
+                    >
+                      <p className=" font-nunito text-black ">
+                        {autoComplete.email}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <LoadingButton
+              type="submit"
+              disabled={isLoading}
+              isLoading={isLoading}
+              className="mt-2 w-fit"
+            >
+              Search
+            </LoadingButton>
+          </div>
         </form>
 
         {user && (
@@ -114,7 +151,7 @@ export function AddUserModel() {
           </div>
         )}
 
-        <DialogFooter className="mt-6">
+        <DialogFooter className="mt-12">
           <div className="flex gap-2 w-full justify-end">
             <LoadingButton
               disabled={isLoading}

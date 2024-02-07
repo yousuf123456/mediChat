@@ -165,7 +165,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
     <>
       <div
         className={clsx(
-          "fixed w-full h-full mb-20 lg:mb-0 lg:w-80 lg:h-full lg:overflow-y-auto lg:flex flex-col border-r-[1px] border-slate-200 bg-white",
+          "fixed w-full h-full mb-20 z-50 lg:mb-0 lg:w-80 lg:h-full lg:overflow-y-auto lg:flex flex-col border-r-[1px] border-slate-200 bg-white",
           isOpen ? "hidden" : "flex"
         )}
       >

@@ -29,7 +29,7 @@ export default async function conversationIdPage({
   } else {
     return (
       <Suspense fallback={<Loading />}>
-        <div className="h-full w-full lg:pl-80 relative">
+        <div className="h-full w-full lg:pl-80 relative ">
           <div className="flex flex-col h-full">
             <Header conversation={conversation} />
             <Body initialMessages={messages} />

@@ -107,6 +107,7 @@ export function Drawer({ conversation }: DrawerProps) {
           </div>
         </SheetDescription>
       </SheetHeader>
+
       <div className="mt-12 flex flex-col gap-4">
         {!conversation.isGroup && (
           <>
@@ -139,6 +140,7 @@ export function Drawer({ conversation }: DrawerProps) {
               <p className="text-sm font-light font-nunito text-neutral-400">
                 Members
               </p>
+
               <MembersList conversation={conversation} />
             </>
           )}

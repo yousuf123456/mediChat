@@ -43,7 +43,7 @@ export const Header: React.FC<HeaderProps> = ({ conversation }) => {
   };
 
   return (
-    <div className="flex flex-row z-[999] bg-white justify-between sticky top-0 left-0 items-center py-3 px-3 sm:px-6 border-b-[1px] border-slate-200">
+    <div className="flex flex-row z-50 bg-white justify-between sticky top-0 left-0 items-center py-3 px-3 sm:px-6 border-b-[1px] border-slate-200">
       <div className="flex items-center gap-4">
         <Link href={"/conversations"} className="lg:hidden">
           <HiChevronLeft className="w-6 h-6 sm:h-7 sm:w-7 text-pink-500 hover:text-pink-600" />
