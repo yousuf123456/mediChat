@@ -16,6 +16,8 @@ import axios from "axios";
 import { toast } from "react-hot-toast";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { UploadModel } from "./UploadModel";
+import { Button } from "@/components/ui/button";
+import { signOut } from "next-auth/react";
 
 interface ProfileDrawerProps {
   user: User | null;
@@ -110,6 +112,7 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({ user }) => {
                   <p className="text-sm text-neutral-500 font-roboto font-light">
                     Name
                   </p>
+
                   <HiPencil
                     onClick={() => setNameModelOpen(true)}
                     className="w-4 h-4 text-pink-500 cursor-pointer"
@@ -150,6 +153,12 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({ user }) => {
                 <p className="text-base font-medium font-nunito text-indigo-950">
                   {user?.id}
                 </p>
+              </div>
+
+              <div className="w-full flex justify-end mt-6">
+                <Button className="bg-pink-500" onClick={() => signOut()}>
+                  Logout
+                </Button>
               </div>
             </div>
           </SheetDescription>

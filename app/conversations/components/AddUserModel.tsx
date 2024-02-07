@@ -94,7 +94,7 @@ export function AddUserModel() {
       >
         <form onSubmit={handleSubmit(searchUser)}>
           <div className="flex flex-col gap-2">
-            <h2 className="mt-4 text-base font-roboto text-start font-medium text-indigo-950">
+            <h2 className="mt-4 text-sm sm:text-base font-roboto text-start font-medium text-indigo-950">
               Search user by his Email or Id.
             </h2>
 

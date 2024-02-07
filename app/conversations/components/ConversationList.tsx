@@ -13,10 +13,12 @@ import { User } from "@prisma/client";
 import { Avatar } from "@/app/components/sidebar/Avatar";
 import { Sheet, SheetTrigger } from "@/components/ui/sheet";
 import { ProfileDrawer } from "@/app/components/sidebar/ProfileDrawer";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { pusherClient } from "@/app/libs/pusher";
 import { find } from "lodash";
 import Image from "next/image";
+import { DesktopSidebarItem } from "@/app/components/sidebar/DesktopSidebarItem";
+import { HiLogout } from "react-icons/hi";
 
 interface ConversationListProps {
   initialItems: FullConversationType[];
@@ -273,6 +275,29 @@ export const ConversationList: React.FC<ConversationListProps> = ({
               );
             }
           })}
+        </div>
+
+        <div className="fixed hidden lg:block bottom-0 left-0 w-80 px-6 py-2 border-t-[1px] border-slate-200 z-[51]">
+          <div className="flex items-center justify-between">
+            <div>
+              <Sheet defaultOpen={false}>
+                <SheetTrigger>
+                  <div className="relative w-11 h-11 rounded-full overflow-hidden flex flex-col items-center">
+                    <Avatar user={currentUser} />
+                  </div>
+                </SheetTrigger>
+
+                <ProfileDrawer user={currentUser} />
+              </Sheet>
+            </div>
+
+            <DesktopSidebarItem
+              icon={HiLogout}
+              onClick={() => signOut()}
+              label="logout"
+              href="/"
+            />
+          </div>
         </div>
       </div>
     </>
