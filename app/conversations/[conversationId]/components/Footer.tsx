@@ -18,7 +18,7 @@ export const Footer = () => {
   };
 
   return (
-    <div className="py-3 px-3 sm:px-6 bg-white border-t-[1px] border-slate-200 w-full">
+    <div className="py-3 px-3 sm:px-6 sticky bottom-0 left-0 bg-white border-t-[1px] border-slate-200 w-full">
       <div className="flex items-center gap-2 w-full">
         <div className="h-full flex items-end">
           <CldUploadButton
