@@ -35,8 +35,6 @@
     "encoding": "^0.1.13",
     "eslint": "8.41.0",
     "eslint-config-next": "13.4.4",
-    "firebase": "^9.22.2",
-    "firebase-admin": "^11.9.0",
     "fs": "^0.0.1-security",
     "localforage": "^1.10.0",
     "lodash": "^4.17.21",
