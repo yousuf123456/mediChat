@@ -110,12 +110,13 @@ export async function POST(request: Request) {
 
       fakeSeenMessages.pop();
 
-      // pusherServer.trigger(user?.email!, "conversation:update", {
-      //   id: updatedConversation.id,
-      //   messages: [...fakeSeenMessages, lastMessage],
-      // });
+      pusherServer.trigger(user?.email!, "conversation:update", {
+        id: updatedConversation.id,
+        messages: [...fakeSeenMessages, lastMessage],
+      });
     });
 
+    console.log("Sent Message");
     return NextResponse.json(createdMessage);
   } catch (e) {
     console.log(e);
