@@ -42,7 +42,13 @@ export async function POST(request: Request) {
       },
 
       include: {
-        seen: true,
+        seen: {
+          select: {
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
         sender: {
           select: {
             name: true,
@@ -71,7 +77,13 @@ export async function POST(request: Request) {
         users: true,
         messages: {
           include: {
-            seen: true,
+            seen: {
+              select: {
+                name: true,
+                image: true,
+                email: true,
+              },
+            },
           },
         },
       },
