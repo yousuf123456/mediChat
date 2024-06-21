@@ -1,6 +1,5 @@
 import React from "react";
 import { ConversationList } from "./components/ConversationList";
-import { getUsers } from "../actions/getUsers";
 
 import { currentUser } from "@clerk/nextjs/server";
 import { Presence } from "../context/Presence";
@@ -10,7 +9,6 @@ export default async function conversationsLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const users = await getUsers();
   const user = await currentUser();
 
   if (!user) {
@@ -28,7 +26,6 @@ export default async function conversationsLayout({
               id: user.id,
               imageUrl: user.imageUrl,
             }}
-            users={users}
           />
           {children}
         </div>

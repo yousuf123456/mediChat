@@ -25,12 +25,10 @@ export interface UserInformation {
 }
 
 interface ConversationListProps {
-  users: UserInformation[];
   currentUser: UserInformation | null;
 }
 
 export const ConversationList: React.FC<ConversationListProps> = ({
-  users,
   currentUser,
 }) => {
   const [isGroup, setIsgroup] = useState<boolean>(false);
