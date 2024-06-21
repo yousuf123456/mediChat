@@ -41,7 +41,7 @@ export const LoadingButton = ({
       className={clsx(
         !variant &&
           " bg-pink-500 py-2 transition-all px-4 sm:px-6 text-white font-medium rounded-md hover:bg-pink-600",
-        "h-9",
+        "h-11",
         className,
         disabled && !className && !variant && "bg-blue-800 text-neutral-300"
       )}

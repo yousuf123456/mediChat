@@ -1,9 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    appDir: true,
-    serverActions: true,
-    swcPlugins: [["next-superjson-plugin", {}]],
+    
+    
+    // swcPlugins: [["next-superjson-plugin", {}]],
   },
 
   images: {
@@ -11,6 +11,7 @@ const nextConfig = {
       "lh3.googleusercontent.com",
       "avatars.githubusercontent.com",
       "res.cloudinary.com",
+      "img.clerk.com",
     ],
   },
 };

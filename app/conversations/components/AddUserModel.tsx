@@ -1,7 +1,6 @@
 "use client";
 import axios from "axios";
-import React, { useCallback, useEffect, useState } from "react";
-import { User } from "@prisma/client";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { DialogFooter } from "../../../components/ui/dialog";
@@ -9,73 +8,52 @@ import { DialogFooter } from "../../../components/ui/dialog";
 import { ConfirmationDialog } from "@/components/Dialog";
 import { BsPlus } from "react-icons/bs";
 import { Avatar } from "@/app/components/sidebar/Avatar";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { LoadingButton } from "@/app/components/LoadingButton";
 import { toast } from "react-hot-toast";
 import { Input } from "@/components/ui/input";
+import { useDebounce } from "use-debounce";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { useUser } from "@clerk/nextjs";
 
 export function AddUserModel() {
+  const [email_id, setEmail_id] = useState("");
+  const [debouncedEmail_id] = useDebounce(email_id, 500);
+
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [autocompletes, setAutocompletes] = useState<{ email: string }[]>([]);
-  const [open2, setOpen2] = useState(false);
+  const [searchedUsers, setSearchedUsers] = useState<
+    { emailAddress: string; imageUrl: string; id: string }[]
+  >([]);
 
-  const [user, setUser] = useState<User | null>();
+  const [userId, setUserId] = useState<string | null>();
   const router = useRouter();
 
-  const createConversation = useCallback(
-    (user: User) => {
-      setIsLoading(true);
-      axios
-        .post("../../api/conversation", {
-          user: user,
-          isGroup: false,
-          name: "",
-          members: [],
-        })
-        .then((response) => {
-          const data = response.data;
-          router.push(`/conversations/${data.id}`);
-          toast.success("Added user successfully");
-          setUser(null);
-          setTimeout(() => setOpen(false), 1000);
-        })
-        .catch((e) => {
-          toast.error("Something went wrong !");
-        })
-        .finally(() => setIsLoading(false));
-    },
-    [router]
-  );
-
-  const { register, handleSubmit, setValue, watch } = useForm();
-
-  const email_id = watch("email_id");
-
   useEffect(() => {
-    if (!email_id) return;
+    if (!debouncedEmail_id || debouncedEmail_id.length < 3) return;
 
     axios
-      .post("../../api/getEmailAutocompletes", { email: email_id })
-      .then((res) => setAutocompletes(res.data))
+      .post("../../api/searchUsers", { email_id: debouncedEmail_id })
+      .then((res) => setSearchedUsers(res.data))
       .catch((e) => console.log(e));
-  }, [email_id]);
+  }, [debouncedEmail_id]);
 
-  const onAutocompleteClick = (value: string) => {
-    setValue("email_id", value);
-  };
+  const createConversation = useMutation(api.conversation.create);
 
-  const searchUser: SubmitHandler<FieldValues> = (data) => {
+  const onCreateConversation = () => {
+    if (!userId) return;
     setIsLoading(true);
-    axios
-      .post("../../api/searchUser", data)
-      .then((response) => {
-        const { data } = response;
-        setUser(data);
-        console.log(data);
+
+    createConversation({ userIds: [userId], isGroup: false })
+      .then((res) => {
+        setOpen(false);
+        setUserId(null);
+        setSearchedUsers([]);
+        router.push(`/conversations/${res}`);
+        toast.success("Succesfully Created The Conversation");
       })
-      .catch((e) => toast.error(e.response.data))
       .finally(() => setIsLoading(false));
   };
 
@@ -92,64 +70,53 @@ export function AddUserModel() {
         open={open}
         setOpen={setOpen}
       >
-        <form onSubmit={handleSubmit(searchUser)}>
-          <div className="flex flex-col gap-2">
-            <h2 className="mt-4 text-sm sm:text-base font-roboto text-start font-medium text-indigo-950">
-              Search user by his Email or Id.
-            </h2>
+        <div className="flex flex-col gap-1">
+          <h2 className="mt-4 text-sm sm:text-base font-roboto text-start font-medium text-indigo-950">
+            Search user by his Email or Id.
+          </h2>
 
-            <div className="relative">
-              <Input
-                autoComplete="off"
-                {...register("email_id", { required: true })}
-                type="text"
-                required={true}
-                disabled={isLoading}
-                onFocus={(e) => setOpen2(true)}
-                onBlur={(e) =>
-                  setTimeout(() => {
-                    setOpen2(false);
-                  }, 500)
-                }
-                placeholder="Type user email or id"
-              />
+          <div className="relative flex flex-col gap-8">
+            <Input
+              autoComplete="off"
+              value={email_id}
+              onChange={(e) => setEmail_id(e.target.value)}
+              type="text"
+              required={true}
+              disabled={isLoading}
+              placeholder="Type user email or id"
+            />
 
-              {open2 && autocompletes.length > 0 && (
-                <div className="absolute flex flex-col items-start gap-0 p-1 top-12 left-0 right-0 h-44 overflow-y-auto bg-white shadow-lg rounded-md z-[99999]">
-                  {autocompletes.map((autoComplete, i) => (
+            {searchedUsers.length > 0 && (
+              <RadioGroup value={userId || ""}>
+                <div className="flex flex-col gap-2">
+                  {searchedUsers.map((user) => (
                     <div
-                      key={i}
-                      onClick={() => onAutocompleteClick(autoComplete.email)}
-                      className="px-4 py-2 rounded-sm hover:bg-neutral-100 w-full flex justify-start"
+                      className="px-4 py-3 rounded-xl bg-pink-50 flex justify-between w-full items-center cursor-pointer"
+                      onClick={() => setUserId(user.id)}
                     >
-                      <p className=" font-nunito text-black ">
-                        {autoComplete.email}
-                      </p>
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9">
+                          <Avatar image={user.imageUrl} />
+                        </div>
+                        <p className="text-base text-zinc-800">
+                          {user.emailAddress}
+                        </p>
+                      </div>
+
+                      <RadioGroupItem value={user.id} id={user.id} />
                     </div>
                   ))}
                 </div>
-              )}
-            </div>
+              </RadioGroup>
+            )}
 
-            <LoadingButton
-              type="submit"
-              disabled={isLoading}
-              isLoading={isLoading}
-              className="mt-2 w-fit"
-            >
-              Search
-            </LoadingButton>
+            {searchedUsers.length === 0 && (
+              <p className="w-full text-center text-lg text-black">
+                No Users Found
+              </p>
+            )}
           </div>
-        </form>
-
-        {user && (
-          <div className="mt-4 sm:mt-6 flex flex-row items-center gap-3 px-3 py-2 rounded-sm bg-neutral-100 hover:bg-neutral-200">
-            <div className="w-8 h-8 relative rounded-full overflow-hidden">
-              <Avatar user={user} />
-            </div>
-            <p className="text-base font-medium text-indigo-950">{user.name}</p>
-          </div>
-        )}
+        </div>
 
         <DialogFooter className="mt-12">
           <div className="flex gap-2 w-full justify-end">
@@ -157,8 +124,8 @@ export function AddUserModel() {
               disabled={isLoading}
               variant="outline"
               onClick={() => {
-                setUser(null);
-                setValue("email_id", "");
+                setUserId(null);
+                setEmail_id("");
                 setOpen(false);
               }}
             >
@@ -166,14 +133,9 @@ export function AddUserModel() {
             </LoadingButton>
 
             <LoadingButton
-              onClick={() => {
-                if (user) {
-                  createConversation(user);
-                  setValue("email_id", "");
-                }
-              }}
-              disabled={isLoading}
               isLoading={isLoading}
+              onClick={onCreateConversation}
+              disabled={isLoading || !userId}
             >
               Create
             </LoadingButton>

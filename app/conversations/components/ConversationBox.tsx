@@ -12,39 +12,59 @@ import { ActiveDot } from "@/app/components/sidebar/activeDot";
 import { useActiveList } from "@/app/hooks/useActiveList";
 import { find } from "lodash";
 import { cn } from "@/lib/utils";
+import { Doc } from "@/convex/_generated/dataModel";
+import { useAction, usePaginatedQuery, useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { User } from "@clerk/nextjs/dist/types/server";
+import { useUser } from "@clerk/nextjs";
+import { ConversationBoxLoading } from "./ConversationBoxLoading";
 
 interface conversationBoxProps {
   selected: boolean;
-  item: FullConversationType;
+  item: Doc<"conversations">;
 }
 
 export const ConversationBox: React.FC<conversationBoxProps> = ({
   item,
   selected,
 }) => {
-  const [count, setCount] = useState(0);
+  const [otherUsers, setOtherUsers] = useState<User[] | undefined>(undefined);
 
-  const otherUser = useOtherUser(item.users);
+  useEffect(() => {
+    fetch("http://localhost:3000/api/getUsers", {
+      method: "POST",
+      body: JSON.stringify({
+        conversationId: item._id,
+      }),
+      cache: "force-cache",
+    }).then(async (res) => setOtherUsers(await res.json()));
+  }, []);
+
+  const { results: messages } = usePaginatedQuery(
+    api.conversation.getMessages,
+    {
+      conversationId: item._id,
+    },
+    { initialNumItems: 5 }
+  );
+
   const router = useRouter();
 
-  const { members } = useActiveList();
-  const isActive = members.indexOf(otherUser?.email!) !== -1;
-
   const handleClick = useCallback(() => {
-    router.push(`/conversations/${item.id}`);
-  }, [router, item.id]);
+    router.push(`/conversations/${item._id}`);
+  }, [router, item._id]);
 
   const lastMessage = useMemo(() => {
-    const messages = item.messages || [];
+    if (!messages) return;
 
-    return messages[messages.length - 1];
-  }, [item.messages]);
+    return messages[0];
+  }, [messages]);
 
   const lastMessageText = useMemo(() => {
     let lastMessageText;
     if (lastMessage) {
       if (lastMessage.image) {
-        return (lastMessageText = `${lastMessage?.sender?.name} sent an image`);
+        return (lastMessageText = `${lastMessage.senderName} sent an image`);
       }
     }
 
@@ -55,22 +75,22 @@ export const ConversationBox: React.FC<conversationBoxProps> = ({
     return (lastMessageText = lastMessage.body);
   }, [lastMessage]);
 
-  const session = useSession();
-  const userEmail = useMemo(() => {
-    return session.data?.user?.email;
-  }, [session.data?.user?.email]);
+  const { user, isLoaded } = useUser();
+  const currentUserId = useMemo(() => {
+    return user?.id;
+  }, [user, isLoaded]);
 
   const hasSeen = useMemo(() => {
     if (!lastMessage) {
       return false;
     }
 
-    if (!userEmail) {
+    if (!currentUserId) {
       return false;
     }
 
-    const myEmailInSeen = lastMessage.seen.filter(
-      (user) => user.email === userEmail
+    const myEmailInSeen = lastMessage.seenUserIds.filter(
+      (userId) => userId === currentUserId
     );
 
     if (myEmailInSeen.length === 0) {
@@ -78,15 +98,20 @@ export const ConversationBox: React.FC<conversationBoxProps> = ({
     }
 
     return true;
-  }, [lastMessage, userEmail]);
+  }, [lastMessage, currentUserId]);
 
   const unseenMessageCount = useMemo(() => {
+    if (!lastMessage || messages?.length === 0) return 0;
+
     let count = 0;
 
-    if (userEmail) {
-      for (let i = item.messages.length - 1; i >= 0; i--) {
-        const message = item.messages[i];
-        if (find(message.seen, { email: userEmail })) {
+    if (currentUserId && messages) {
+      for (let i = 0; i <= messages.length - 1; i++) {
+        const message = messages[i];
+        if (
+          message.seenUserIds.filter((userId) => userId === currentUserId)
+            .length > 0
+        ) {
           break;
         }
 
@@ -95,25 +120,29 @@ export const ConversationBox: React.FC<conversationBoxProps> = ({
     }
 
     return count;
-  }, [userEmail, item]);
+  }, [currentUserId, messages]);
+
+  if (!otherUsers || !messages) {
+    return <ConversationBoxLoading />;
+  }
 
   return (
     <div
       className={cn(
-        "relative flex flex-row gap-4 px-3 py-2 items-center bg-white hover:bg-pink-100 transition-all cursor-pointer",
-        selected && "bg-pink-400 lg:hover:bg-pink-400"
+        "relative flex flex-row gap-4 px-3 py-2 items-center bg-white hover:bg-zinc-50 transition-all cursor-pointer",
+        selected && "bg-zinc-50"
       )}
       onClick={handleClick}
     >
       {item.isGroup ? (
         <div className="relative w-14 h-14 rounded-full overflow-hidden">
-          <GroupAvatar users={item.users} size="h-5 w-5" />
+          <GroupAvatar users={otherUsers || []} size="h-5 w-5" />
         </div>
       ) : (
-        <div className="relative w-12 h-12">
-          {isActive && <ActiveDot size="h-3 w-3" />}
-          <div className="relative w-12 h-12 rounded-full overflow-hidden">
-            <Avatar user={otherUser} />
+        <div className="relative w-10 h-10">
+          {/* {isActive && <ActiveDot size="h-3 w-3" />} */}
+          <div className="relative w-10 h-10 rounded-full overflow-hidden">
+            <Avatar image={otherUsers[0]?.imageUrl} />
           </div>
         </div>
       )}
@@ -121,52 +150,44 @@ export const ConversationBox: React.FC<conversationBoxProps> = ({
       <div className="flex flex-col justify-center items-start">
         <p
           className={clsx(
-            "text-md font-nunito font-medium",
-            selected ? "text-white" : "text-black"
+            "text-md font-nunito font-medium line-clamp-1 max-w-[168px]",
+            "text-black"
           )}
         >
-          {item.isGroup ? item.name : otherUser.name}
+          {item.isGroup ? item.name : otherUsers[0]?.firstName}
         </p>
 
         <p
           className={cn(
-            "text-sm font-white font-roboto font-extralight line-clamp-1",
-            hasSeen ? "opacity-60" : "opacity-100",
-            selected ? "text-white opacity-100" : " text-black"
+            "text-sm font-white font-roboto font-extralight line-clamp-1 max-w-[200px] text-black",
+            hasSeen ? "opacity-70" : "opacity-100"
+            // selected && "opacity-100"
           )}
         >
           {lastMessageText}
         </p>
       </div>
 
-      {lastMessage?.createdAt && (
+      {lastMessage?._creationTime && (
         <p
           className={clsx(
             "text-xs font-light absolute top-1 right-2",
             unseenMessageCount !== 0 && !selected
               ? "text-pink-500 font-medium opacity-100"
-              : selected
-              ? "text-white"
               : "text-black opacity-80"
           )}
         >
-          {format(new Date(lastMessage?.createdAt!), "h:mm a")}
+          {format(new Date(lastMessage?._creationTime!), "h:mm a")}
         </p>
       )}
 
       {unseenMessageCount !== 0 && (
         <div
           className={cn(
-            "absolute flex justify-center items-center right-2 bottom-2 w-5 h-5 bg-white rounded-full",
-            !selected && "bg-pink-500"
+            "absolute flex justify-center items-center right-2 bottom-2 w-5 h-5rounded-full bg-pink-500"
           )}
         >
-          <p
-            className={cn(
-              "text-xs font-roboto text-pink-500",
-              !selected && "text-white"
-            )}
-          >
+          <p className={cn("text-xs font-roboto text-white")}>
             {unseenMessageCount}
           </p>
         </div>

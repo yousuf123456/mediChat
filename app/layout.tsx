@@ -1,10 +1,9 @@
 import "./globals.css";
 
-import { ActiveStatus } from "./context/ActiveStatus";
-import { SessionContext } from "./context/SessionContext";
-import { StoreContext } from "./context/StoreContext";
+import { ClerkContext } from "./context/ClerkContext";
 import { ToasterContext } from "./context/ToasterContext";
 import { Poppins, Nunito, Roboto } from "next/font/google";
+import { StrictMode } from "react";
 
 const nunito = Nunito({
   subsets: ["latin"],
@@ -25,8 +24,8 @@ const roboto = Roboto({
 });
 
 export const metadata = {
-  title: "MediChat",
-  description: "MediChat",
+  title: "ChatVibe",
+  description: "ChatVibe",
 };
 
 export default function RootLayout({
@@ -35,17 +34,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
+    <StrictMode>
+
     <html
       lang="en"
       className={`${poppins.variable} ${nunito.variable} ${roboto.variable}`}
     >
       <body className="h-screen">
-        <SessionContext>
-          <ToasterContext />
-          <ActiveStatus />
-          <StoreContext>{children}</StoreContext>
-        </SessionContext>
+        <ToasterContext />
+       
+        <ClerkContext>{children}</ClerkContext>
       </body>
     </html>
+    </StrictMode>
   );
 }

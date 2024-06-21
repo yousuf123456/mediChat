@@ -2,23 +2,36 @@
 import React from "react";
 import { CldUploadButton } from "next-cloudinary";
 
-import { HiDocumentAdd } from "react-icons/hi";
 import { MessageInput } from "./MessageInput";
-import axios from "axios";
 import useConversation from "@/app/hooks/useConversation";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+import { Cloud, File, Upload } from "lucide-react";
+import { HiDocumentAdd } from "react-icons/hi";
 
-export const Footer = () => {
+export const Footer = ({
+  updateMyPresence,
+}: {
+  updateMyPresence: (
+    patch: Partial<{
+      typing: boolean;
+    }>
+  ) => void;
+}) => {
   const { conversationId } = useConversation();
 
+  const sendMessage = useMutation(api.conversation.message);
+
   const onUpload = (result: any) => {
-    axios.post("/api/messages", {
+    sendMessage({
+      conversationId: conversationId as Id<"conversations">,
       image: result?.info?.secure_url,
-      conversationId: conversationId,
     });
   };
 
   return (
-    <div className="py-3 px-3 z-50 sm:px-6 sticky bottom-0 left-0 bg-white border-t-[1px] border-slate-200 w-full">
+    <div className="h-fit py-3 px-3 z-50 sm:px-6 sticky bottom-0 left-0 bg-white w-full">
       <div className="flex items-center gap-2 w-full">
         <div className="h-full flex items-end">
           <CldUploadButton
@@ -28,12 +41,12 @@ export const Footer = () => {
             }}
             uploadPreset="vmnlloyx"
           >
-            <HiDocumentAdd className="w-9 h-9 sm:w-9 sm:h-8 text-pink-500 cursor-pointer transition-all hover:text-pink-600" />
+            <HiDocumentAdd className="w-8 h-8 text-zinc-500 cursor-pointer transition-all hover:text-zinc-600" />
           </CldUploadButton>
         </div>
 
         <div className="w-full">
-          <MessageInput />
+          <MessageInput updateMyPresence={updateMyPresence} />
         </div>
       </div>
     </div>

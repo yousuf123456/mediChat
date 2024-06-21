@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { HiChevronDown, HiChevronUp, HiX } from "react-icons/hi";
-import { User } from "@prisma/client";
 import { Avatar } from "@/app/components/sidebar/Avatar";
 import { Input } from "@/app/components/inputs/Input";
 import {
@@ -13,9 +12,11 @@ import {
   useForm,
 } from "react-hook-form";
 import clsx from "clsx";
+import { User } from "@clerk/nextjs/dist/types/server";
+import { UserInformation } from "./ConversationList";
 
 type Props = {
-  users: User[];
+  users: UserInformation[];
   selectedUsers: never[];
   setSelectedUsers: React.Dispatch<React.SetStateAction<never[]>>;
   register: UseFormRegister<FieldValues>;
@@ -24,12 +25,12 @@ type Props = {
   disabled?: boolean;
 };
 
-const UserSearch = (users: User[], searchedQuery: string) => {
-  let closestUser: User | null = null;
+const UserSearch = (users: UserInformation[], searchedQuery: string) => {
+  let closestUser: UserInformation | null = null;
   let closestDistance = -1;
 
   var stringSimilarity = require("string-similarity");
-  users.forEach((user: User) => {
+  users.forEach((user: UserInformation) => {
     const distance = stringSimilarity.compareTwoStrings(
       user?.name,
       searchedQuery
@@ -87,7 +88,7 @@ export const Select = ({
                     className="px-2 py-2 flex gap-2 items-center bg-blue-100 rounded-sm"
                   >
                     <h3 className="text-xs font-normal text-indigo-950">
-                      {person.name}
+                      {person.firstName}
                     </h3>
                     <HiX
                       onClick={() => deletePerson(index)}
@@ -159,7 +160,7 @@ export const Select = ({
                               <Avatar user={closestUser} />
                             </div>
                             <h1 className="text-sm text-indigo-950">
-                              {closestUser.name}
+                              {closestUser.firstName}
                             </h1>
                           </div>
                         </Listbox.Option>

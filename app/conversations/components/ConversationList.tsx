@@ -1,184 +1,61 @@
 "use client";
 import clsx from "clsx";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useState } from "react";
 import { BsPersonAdd } from "react-icons/bs";
 import { AddUserModel } from "./AddUserModel";
-
-import { FullConversationType, FullMessageType } from "@/app/types";
 
 import { ConversationBox } from "./ConversationBox";
 import useConversation from "@/app/hooks/useConversation";
 import { CreateGroupModel } from "./CreateGroupModel";
-import { User } from "@prisma/client";
 import { Avatar } from "@/app/components/sidebar/Avatar";
 import { Sheet, SheetTrigger } from "@/components/ui/sheet";
 import { ProfileDrawer } from "@/app/components/sidebar/ProfileDrawer";
-import { signOut, useSession } from "next-auth/react";
-import { pusherClient } from "@/app/libs/pusher";
-import { find } from "lodash";
 import Image from "next/image";
 import { DesktopSidebarItem } from "@/app/components/sidebar/DesktopSidebarItem";
-import { HiLogout } from "react-icons/hi";
+import { SignOutButton } from "@clerk/nextjs";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { Loader2, LogOut } from "lucide-react";
+
+export interface UserInformation {
+  name: string | null;
+  imageUrl: string | null;
+  id: string;
+  emailAddress: string | null;
+}
 
 interface ConversationListProps {
-  initialItems: FullConversationType[];
-  initialUsers: User[];
-  currentUser: User | null;
+  users: UserInformation[];
+  currentUser: UserInformation | null;
 }
 
 export const ConversationList: React.FC<ConversationListProps> = ({
-  initialItems,
-  initialUsers,
+  users,
   currentUser,
 }) => {
-  const [conversations, setConversations] = useState(initialItems);
-  const [users, setUsers] = useState(initialUsers);
-  const [initialCurrentUser, setInitialCurrentUser] = useState(currentUser);
-
   const [isGroup, setIsgroup] = useState<boolean>(false);
   const [model2Open, setModel2Open] = useState(false);
 
   const { conversationId, isOpen } = useConversation();
-  const session = useSession();
 
-  const pusherKey = useMemo(() => {
-    return session?.data?.user?.email;
-  }, [session?.data?.user?.email]);
-
-  useEffect(() => {
-    if (!pusherKey) {
-      return;
-    }
-
-    pusherClient.subscribe(pusherKey);
-
-    const updatedConversationHandler = (updatedConversation: {
-      id: string;
-      messages: any[];
-    }) => {
-      setConversations((currentConversations) => {
-        return currentConversations.map((currentConversation) => {
-          if (currentConversation.id === updatedConversation.id) {
-            return {
-              ...currentConversation,
-              messages: updatedConversation.messages,
-            };
-          }
-          return currentConversation;
-        });
-      });
-    };
-
-    const newConversationHandler = (newConversation: FullConversationType) => {
-      setConversations((currentConversations) => {
-        if (find(currentConversations, { id: newConversation.id })) {
-          return currentConversations;
-        }
-
-        return [newConversation, ...currentConversations];
-      });
-    };
-
-    const deletedConversationHandler = (deletedConversation: {
-      id: string;
-    }) => {
-      setConversations((prevConversations) => {
-        return prevConversations.filter(
-          (prevConversation) => prevConversation.id !== deletedConversation.id
-        );
-      });
-    };
-
-    const updatedUserHandler = (updatedUser: {
-      id: string;
-      name: string;
-      image: string;
-    }) => {
-      setConversations((currentConversations) => {
-        return currentConversations.map((currentConversation) => {
-          if (currentConversation.isGroup) {
-            return currentConversation;
-          }
-
-          let updatedUsers;
-          if (currentConversation.userIds.includes(updatedUser.id)) {
-            updatedUsers = currentConversation.users.map((user) => {
-              if (user.id === updatedUser.id) {
-                return {
-                  ...user,
-                  name: updatedUser.name,
-                  image: updatedUser.image,
-                };
-              }
-
-              return user;
-            });
-          } else {
-            updatedUsers = currentConversation.users;
-          }
-
-          return { ...currentConversation, users: updatedUsers };
-        });
-      });
-
-      setUsers((currentUsers) => {
-        return currentUsers.map((user) => {
-          if (user.id === updatedUser.id) {
-            return {
-              ...user,
-              name: updatedUser.name,
-              image: updatedUser.image,
-            };
-          }
-
-          return user;
-        });
-      });
-
-      if (updatedUser.id === initialCurrentUser?.id) {
-        setInitialCurrentUser((prevCurrentUser) => {
-          return {
-            ...prevCurrentUser!,
-            image: updatedUser.image,
-            name: updatedUser.name,
-          };
-        });
-      }
-    };
-
-    pusherClient.bind("conversation:update", updatedConversationHandler);
-    pusherClient.bind("conversation:delete", deletedConversationHandler);
-    pusherClient.bind("conversation:new", newConversationHandler);
-    pusherClient.bind("user:update", updatedUserHandler);
-    pusherClient.bind("testing", (data: string) => alert(data));
-
-    return () => {
-      pusherClient.unbind("conversation:update", updatedConversationHandler);
-      pusherClient.unbind("conversation:delete", deletedConversationHandler);
-      pusherClient.unbind("conversation:new", newConversationHandler);
-      pusherClient.unbind("user:update", updatedUserHandler);
-      pusherClient.unbind("testing", (data: string) => alert(data));
-
-      pusherClient.unsubscribe(pusherKey);
-    };
-  }, [pusherKey]);
+  const conversations = useQuery(api.conversations.get, {});
 
   return (
     <>
       <div
         className={clsx(
-          "fixed w-full h-full mb-20 z-50 lg:mb-0 lg:w-80 lg:h-full lg:overflow-y-auto lg:flex flex-col border-r-[1px] border-slate-200 bg-white",
+          "fixed w-full h-full mb-20 z-50 lg:mb-0 lg:w-80 lg:h-full lg:overflow-y-auto lg:flex flex-col border-slate-200 bg-white",
           isOpen ? "hidden" : "flex"
         )}
       >
-        <div className="w-full border-b-[1px] border-slate-200">
+        <div className="w-full border-slate-200">
           <div className="sm:py-0 h-full lg:py-4 max-[440px]:px-4 max-sm:px-8 relative">
             <div className="h-full w-full flex py-3 lg:py-4 gap-4 items-center sm:justify-center">
               <div className="w-[40px] h-[20px] sm:w-[50px] sm:h-[25px] relative">
                 <Image alt="Logo" src={"/images/logo.png"} fill />
               </div>
 
-              <h1 className="text-xl sm:text-2xl text-pink-500 font-nunito font-medium">
+              <h1 className="text-xl sm:text-2xl bg-gradient-to-b from-black to-pink-500 font-nunito font-medium bg-clip-text text-transparent">
                 ChatVibe
               </h1>
             </div>
@@ -186,11 +63,11 @@ export const ConversationList: React.FC<ConversationListProps> = ({
             <Sheet defaultOpen={false}>
               <SheetTrigger className="lg:hidden">
                 <div className="absolute w-10 h-10 rounded-full overflow-hidden right-4 sm:right-8 top-1/2 -translate-y-1/2">
-                  <Avatar user={initialCurrentUser} />
+                  <Avatar image={currentUser?.imageUrl} />
                 </div>
               </SheetTrigger>
 
-              <ProfileDrawer user={initialCurrentUser} />
+              <ProfileDrawer user={currentUser} />
             </Sheet>
           </div>
         </div>
@@ -249,7 +126,6 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                 />
 
                 <CreateGroupModel
-                  users={users}
                   title="Create a New Group"
                   modifytrigger={false}
                   open={model2Open}
@@ -261,29 +137,37 @@ export const ConversationList: React.FC<ConversationListProps> = ({
         </div>
 
         <div className="mt-8 flex flex-col gap-0">
-          {conversations.map((conversation) => {
-            let selected;
-            if (conversationId === conversation.id) selected = true;
-            else selected = false;
-            if (conversation.isGroup === isGroup) {
-              return (
-                <ConversationBox
-                  key={conversation.id}
-                  item={conversation}
-                  selected={selected}
-                />
-              );
-            }
-          })}
+          {conversations ? (
+            conversations.map((conversation) => {
+              let selected;
+              if (conversationId === conversation._id) selected = true;
+              else selected = false;
+              if (conversation.isGroup === isGroup) {
+                return (
+                  <ConversationBox
+                    key={conversation._id}
+                    item={conversation}
+                    selected={selected}
+                  />
+                );
+              }
+            })
+          ) : (
+            <div className="mt-4 w-full flex justify-center items-center flex-col gap-2">
+              <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
+
+              <p className="text-zinc-600">Loading Chats</p>
+            </div>
+          )}
         </div>
 
-        <div className="fixed hidden lg:block bottom-0 left-0 w-80 px-6 py-2 border-t-[1px] border-slate-200 z-[51]">
+        <div className="fixed hidden lg:block bottom-0 left-0 w-80 px-6 py-3 border-t-[1px] border-slate-200 z-[51]">
           <div className="flex items-center justify-between">
             <div>
               <Sheet defaultOpen={false}>
                 <SheetTrigger>
-                  <div className="relative w-11 h-11 rounded-full overflow-hidden flex flex-col items-center">
-                    <Avatar user={currentUser} />
+                  <div className="relative w-10 h-10 rounded-full overflow-hidden flex flex-col items-center">
+                    <Avatar image={currentUser?.imageUrl} />
                   </div>
                 </SheetTrigger>
 
@@ -291,12 +175,9 @@ export const ConversationList: React.FC<ConversationListProps> = ({
               </Sheet>
             </div>
 
-            <DesktopSidebarItem
-              icon={HiLogout}
-              onClick={() => signOut()}
-              label="logout"
-              href="/"
-            />
+            <SignOutButton>
+              <DesktopSidebarItem icon={LogOut} label="logout" href="/" />
+            </SignOutButton>
           </div>
         </div>
       </div>

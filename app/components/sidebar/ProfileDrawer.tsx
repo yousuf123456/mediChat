@@ -7,7 +7,6 @@ import {
   SheetTitle,
 } from "../../../components/ui/sheet";
 import { Avatar } from "./Avatar";
-import { User } from "@prisma/client";
 import { BsCameraFill } from "react-icons/bs";
 import { HiPencil } from "react-icons/hi";
 import { EditNameDialog } from "./EditNameDialog";
@@ -18,9 +17,10 @@ import { DialogClose } from "@radix-ui/react-dialog";
 import { UploadModel } from "./UploadModel";
 import { Button } from "@/components/ui/button";
 import { signOut } from "next-auth/react";
+import { UserInformation } from "@/app/conversations/components/ConversationList";
 
 interface ProfileDrawerProps {
-  user: User | null;
+  user: UserInformation | null;
 }
 
 export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({ user }) => {
@@ -38,7 +38,7 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({ user }) => {
   } = useForm({
     defaultValues: {
       name: name || user?.name,
-      image: user?.image,
+      image: user?.imageUrl,
     },
   });
 
@@ -84,79 +84,56 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({ user }) => {
         className="w-full min-[420px]:max-w-xl sm:max-w-sm pt-0 px-0 text-white"
       >
         <SheetHeader>
-          <SheetTitle className="bg-pink-500 font-nunito font-medium text-white text-xl px-6 py-3 rounded-bl-2xl rounded-br-2xl">
+          <SheetTitle className="font-nunito font-medium text-xl px-6 py-3">
             Profile
           </SheetTitle>
 
           <SheetDescription className="px-6 pt-4">
             <div className="w-full flex flex-col items-center">
               <div className="relative">
-                <DialogClose>
-                  <div
-                    onClick={() => {
-                      setIsOpen(true);
-                    }}
-                    className="cursor-pointer z-10 absolute right-[-8px] bottom-0 p-2 bg-pink-500 rounded-full flex justify-center items-center"
-                  >
-                    <BsCameraFill className="w-4 h-4 text-white" />
-                  </div>
-                </DialogClose>
-
-                <div className="w-20 h-20 relative rounded-full overflow-hidden">
-                  <Avatar user={user} />
+                <div className="w-16 h-16 relative rounded-full overflow-hidden">
+                  <Avatar image={user?.imageUrl} />
                 </div>
               </div>
 
               <div className="w-full flex flex-col items-start mt-6">
                 <div className="w-full flex justify-between items-center">
-                  <p className="text-sm text-neutral-500 font-roboto font-light">
+                  <p className="text-sm text-zinc-500 font-roboto font-light">
                     Name
                   </p>
-
-                  <HiPencil
-                    onClick={() => setNameModelOpen(true)}
-                    className="w-4 h-4 text-pink-500 cursor-pointer"
-                  />
-
-                  <EditNameDialog
-                    open={nameModelOpen}
-                    setOpen={setNameModelOpen}
-                    title="Edit your public name"
-                    isLoading={isLoading}
-                    modifyTrigger={false}
-                    register={register}
-                    onSubmit={onSubmit}
-                    handleSubmit={handleSubmit}
-                  />
                 </div>
 
-                <p className="text-base font-medium font-nunito text-indigo-950">
+                <p className="text-base font-medium font-nunito text-black">
                   {name || user?.name}
                 </p>
               </div>
 
               <div className="w-full flex flex-col items-start mt-6">
-                <p className="text-sm text-neutral-500 font-roboto font-light">
+                <p className="text-sm text-zinc-500 font-roboto font-light">
                   Email
                 </p>
 
-                <p className="text-base font-medium font-nunito text-indigo-950">
-                  {user?.email}
+                <p className="text-base font-medium font-nunito text-black">
+                  {user?.emailAddress}
                 </p>
               </div>
 
               <div className="w-full flex flex-col items-start mt-6">
-                <p className="text-sm text-neutral-500 font-roboto font-light">
+                <p className="text-sm text-zinc-500 font-roboto font-light">
                   Id
                 </p>
 
-                <p className="text-base font-medium font-nunito text-indigo-950">
+                <p className="text-base font-medium font-nunito text-black">
                   {user?.id}
                 </p>
               </div>
 
-              <div className="w-full flex justify-end mt-6">
-                <Button className="bg-pink-500" onClick={() => signOut()}>
+              <div className="w-full flex justify-end mt-12">
+                <Button
+                  variant={"secondary"}
+                  className="w-full"
+                  onClick={() => signOut()}
+                >
                   Logout
                 </Button>
               </div>

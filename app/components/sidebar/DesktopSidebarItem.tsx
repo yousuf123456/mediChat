@@ -23,7 +23,7 @@ export const DesktopSidebarItem: React.FC<DesktopSidebarItemProps> = ({
         <Icon
           className={clsx(
             "w-7 h-7 cursor-pointer transition-all",
-            "text-pink-500 group-hover:text-pink-600"
+            "text-zinc-500 group-hover:text-zinc-600"
           )}
           onClick={onClick}
         />

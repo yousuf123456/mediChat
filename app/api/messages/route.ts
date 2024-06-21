@@ -59,6 +59,7 @@ export async function POST(request: Request) {
       },
     });
 
+    console.log("I am here stuck");
     const updatedConversation = await prisma.conversation.update({
       where: {
         id: conversationId,
@@ -88,7 +89,7 @@ export async function POST(request: Request) {
         },
       },
     });
-
+    console.log("I am here released");
     pusherServer.trigger(conversationId, "messages:new", createdMessage);
 
     const lastMessage =
@@ -116,7 +117,6 @@ export async function POST(request: Request) {
       });
     });
 
-    console.log("Sent Message");
     return NextResponse.json(createdMessage);
   } catch (e) {
     console.log(e);
