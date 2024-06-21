@@ -184,7 +184,7 @@ export const ConversationBox: React.FC<conversationBoxProps> = ({
       {unseenMessageCount !== 0 && (
         <div
           className={cn(
-            "absolute flex justify-center items-center right-2 bottom-2 w-5 h-5rounded-full bg-pink-500"
+            "absolute flex justify-center items-center right-2 bottom-2 w-5 h-5 rounded-full bg-pink-500"
           )}
         >
           <p className={cn("text-xs font-roboto text-white")}>
