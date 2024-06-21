@@ -2,7 +2,6 @@ import { EmptyState } from "@/app/(site)/components/EmptyState";
 import { getCurrentUser } from "@/app/actions/getCurrentUser";
 import prisma from "../../../../libs/prismadb";
 import { NextResponse } from "next/server";
-import { pusherServer } from "@/app/libs/pusher";
 import { find } from "lodash";
 
 interface IParams {
@@ -61,19 +60,6 @@ export async function POST(request: Request, { params }: { params: IParams }) {
         seen: true,
         sender: true,
       },
-    });
-
-    await pusherServer.trigger(
-      conversationId,
-      "message:update",
-      updatedMessage
-    );
-
-    existingConversation.users.map((user) => {
-      pusherServer.trigger(user?.email!, "conversation:update", {
-        id: existingConversation.id,
-        messages: [updatedMessage],
-      });
     });
 
     return NextResponse.json(updatedMessage);

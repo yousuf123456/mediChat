@@ -1,7 +1,6 @@
 import { getCurrentUser } from "@/app/actions/getCurrentUser";
 import prisma from "../../libs/prismadb";
 import { NextResponse } from "next/server";
-import { pusherServer } from "@/app/libs/pusher";
 import { User } from "@prisma/client";
 import { find } from "lodash";
 
@@ -89,8 +88,6 @@ export async function POST(request: Request) {
         },
       },
     });
-    console.log("I am here released");
-    pusherServer.trigger(conversationId, "messages:new", createdMessage);
 
     const lastMessage =
       updatedConversation.messages[updatedConversation.messages.length - 1];
@@ -110,11 +107,6 @@ export async function POST(request: Request) {
       }
 
       fakeSeenMessages.pop();
-
-      pusherServer.trigger(user?.email!, "conversation:update", {
-        id: updatedConversation.id,
-        messages: [...fakeSeenMessages, lastMessage],
-      });
     });
 
     return NextResponse.json(createdMessage);
