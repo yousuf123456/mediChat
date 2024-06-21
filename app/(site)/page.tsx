@@ -23,16 +23,16 @@ export default function Home() {
                   <Image fill alt="Logo" src={"/images/logo.png"} />
                 </div>
 
-                <h1 className="text-transparent bg-clip-text bg-gradient-to-b from-black to-pink-500 min-[960px]:text-3xl hidden min-[460px]:block text-2xl font-nunito font-medium">
+                <h1 className="text-transparent bg-clip-text bg-gradient-to-b from-black to-pink-500 min-[960px]:text-3xl text-2xl font-nunito font-medium">
                   ChatVibe
                 </h1>
               </div>
 
-              <p className="mt-10 hidden min-[960px]:block text-lg xl:text-xl text-black opacity-75 text-center max-w-xs xl:max-w-sm font-light font-nunito">
+              <p className="mt-10 text-lg xl:text-xl text-black opacity-75 text-center max-w-xs xl:max-w-sm font-light font-nunito">
                 Start Vibing With This World And Create Friends
               </p>
 
-              <div className="flex-col hidden min-[960px]:flex items-center gap-2">
+              <div className="flex-col flex items-center gap-2">
                 <CupSoda className="xl:w-7 w-6 h-6 xl:h-7 text-black opacity-60" />
                 <p className="xl:text-xl text-lg text-black opacity-75 font-nunito font-light">
                   Enjoy The Life
