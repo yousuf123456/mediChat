@@ -89,8 +89,9 @@ export function AddUserModel() {
             {searchedUsers.length > 0 && (
               <RadioGroup value={userId || ""}>
                 <div className="flex flex-col gap-2">
-                  {searchedUsers.map((user) => (
+                  {searchedUsers.map((user, i) => (
                     <div
+                      key={i}
                       className="px-4 py-3 rounded-xl bg-pink-50 flex justify-between w-full items-center cursor-pointer"
                       onClick={() => setUserId(user.id)}
                     >

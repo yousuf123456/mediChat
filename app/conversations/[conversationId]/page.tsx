@@ -16,7 +16,7 @@ import { useInView } from "react-intersection-observer";
 import { MessageBox } from "./components/MessageBox";
 import usePresence from "@/app/hooks/usePresence";
 
-export default function conversationIdPage() {
+export default function ConversationIdPage() {
   const { user } = useUser();
   const params = useParams<{ conversationId: string }>();
   const conversationId = params?.conversationId as string;

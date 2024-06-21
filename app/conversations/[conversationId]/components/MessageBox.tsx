@@ -111,3 +111,5 @@ export const MessageBox = forwardRef<Ref, MessageBoxProps>(
     );
   }
 );
+
+MessageBox.displayName = "MessageBox";
