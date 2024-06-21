@@ -9,6 +9,7 @@ import {
 
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { ConvexReactClient } from "convex/react";
+import { PageLoading } from "../components/PageLoading";
 
 const convex = new ConvexReactClient(
   process.env.NEXT_PUBLIC_CONVEX_URL as string
@@ -21,7 +22,7 @@ export const ClerkContext = ({ children }: { children: React.ReactNode }) => {
     >
       <ConvexProviderWithClerk useAuth={useAuth} client={convex}>
         <ClerkLoading>
-          <p>Clerk is loading...</p>
+          <PageLoading />
         </ClerkLoading>
         <ClerkLoaded>{children}</ClerkLoaded>
       </ConvexProviderWithClerk>
