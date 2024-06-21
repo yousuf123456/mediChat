@@ -31,7 +31,7 @@ export const ConversationBox: React.FC<conversationBoxProps> = ({
   const [otherUsers, setOtherUsers] = useState<User[] | undefined>(undefined);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_APP_BASE_URL}/api/getUsers`, {
+    fetch(`https://chat-vibe-two.vercel.app/api/getUsers`, {
       method: "POST",
       body: JSON.stringify({
         conversationId: item._id,
