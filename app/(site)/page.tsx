@@ -1,11 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import AuthForm from "./components/AuthForm";
 import Image from "next/image";
 import { CupSoda } from "lucide-react";
 import {
-  SignIn,
   SignInButton,
   SignOutButton,
   SignUpButton,
@@ -52,12 +49,20 @@ export default function Home() {
                 </SignedIn>
 
                 <SignedOut>
-                  <SignInButton forceRedirectUrl={"/conversations"}>
+                  <SignInButton
+                    forceRedirectUrl={
+                      "https://chat-vibe-two.vercel.app/conversations"
+                    }
+                  >
                     <Button className="w-full bg-black/95 hover:bg-black/90">
                       Sign In
                     </Button>
                   </SignInButton>
-                  <SignUpButton forceRedirectUrl={"/conversations"}>
+                  <SignUpButton
+                    forceRedirectUrl={
+                      "https://chat-vibe-two.vercel.app/conversations"
+                    }
+                  >
                     <Button className="w-full" variant={"secondary"}>
                       Create Account
                     </Button>
