@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "target": "es5",
+    "downlevelIteration": true,
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -23,6 +24,14 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "utils/firebase.js", "components/PushNotificationLayout.jsx", "public/firebase-messaging-sw.ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "utils/firebase.js",
+    "components/PushNotificationLayout.jsx",
+    "public/firebase-messaging-sw.ts"
+  ],
   "exclude": ["node_modules"]
 }
