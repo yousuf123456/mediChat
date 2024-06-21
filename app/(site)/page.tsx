@@ -49,20 +49,12 @@ export default function Home() {
                 </SignedIn>
 
                 <SignedOut>
-                  <SignInButton
-                    forceRedirectUrl={
-                      "https://chat-vibe-two.vercel.app/conversations"
-                    }
-                  >
+                  <SignInButton>
                     <Button className="w-full bg-black/95 hover:bg-black/90">
                       Sign In
                     </Button>
                   </SignInButton>
-                  <SignUpButton
-                    forceRedirectUrl={
-                      "https://chat-vibe-two.vercel.app/conversations"
-                    }
-                  >
+                  <SignUpButton>
                     <Button className="w-full" variant={"secondary"}>
                       Create Account
                     </Button>
