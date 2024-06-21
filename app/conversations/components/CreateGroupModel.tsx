@@ -1,7 +1,6 @@
 import { ConfirmationDialog } from "@/components/Dialog";
 import { DialogFooter } from "@/components/ui/dialog";
 import React, { useEffect, useState } from "react";
-import { Select } from "./Select";
 import { FieldValues, useForm } from "react-hook-form";
 import { LoadingButton } from "@/app/components/LoadingButton";
 import axios from "axios";
