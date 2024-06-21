@@ -1,23 +1,18 @@
 import { Avatar } from "@/app/components/sidebar/Avatar";
-import { FullConversationType } from "@/app/types";
 import React, { useCallback, useMemo, useState, useEffect } from "react";
 
-import { useOtherUser } from "../../hooks/useOtherUser";
 import clsx from "clsx";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { GroupAvatar } from "@/app/components/sidebar/GroupAvatar";
 import { format } from "date-fns";
-import { ActiveDot } from "@/app/components/sidebar/activeDot";
-import { useActiveList } from "@/app/hooks/useActiveList";
-import { find } from "lodash";
 import { cn } from "@/lib/utils";
 import { Doc } from "@/convex/_generated/dataModel";
-import { useAction, usePaginatedQuery, useQuery } from "convex/react";
+import { usePaginatedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { User } from "@clerk/nextjs/dist/types/server";
 import { useUser } from "@clerk/nextjs";
 import { ConversationBoxLoading } from "./ConversationBoxLoading";
+import { getAppBaseUrl } from "@/app/utils/getAppBaseUrl";
 
 interface conversationBoxProps {
   selected: boolean;
@@ -30,8 +25,9 @@ export const ConversationBox: React.FC<conversationBoxProps> = ({
 }) => {
   const [otherUsers, setOtherUsers] = useState<User[] | undefined>(undefined);
 
+  const appUrl = getAppBaseUrl();
   useEffect(() => {
-    fetch(`https://chat-vibe-two.vercel.app/api/getUsers`, {
+    fetch(`${appUrl}/api/getUsers`, {
       method: "POST",
       body: JSON.stringify({
         conversationId: item._id,

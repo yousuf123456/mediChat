@@ -16,6 +16,7 @@ import { useInView } from "react-intersection-observer";
 import { MessageBox } from "./components/MessageBox";
 import usePresence from "@/app/hooks/usePresence";
 import { PageLoading } from "@/app/components/PageLoading";
+import { getAppBaseUrl } from "@/app/utils/getAppBaseUrl";
 
 export default function ConversationIdPage() {
   const { user } = useUser();
@@ -34,8 +35,9 @@ export default function ConversationIdPage() {
     { initialNumItems: 25 }
   );
 
+  const appUrl = getAppBaseUrl();
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_APP_BASE_URL}/api/getUsers`, {
+    fetch(`${appUrl}/api/getUsers`, {
       method: "POST",
       body: JSON.stringify({
         conversationId: conversationId,
