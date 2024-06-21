@@ -1,6 +1,6 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { CldUploadButton } from "next-cloudinary";
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment } from "react";
 import Image from "next/image";
 import {
   FieldValues,
