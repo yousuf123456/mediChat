@@ -32,7 +32,7 @@ export default function Home() {
               </div>
 
               <p className="mt-10 hidden min-[960px]:block text-lg xl:text-xl text-black opacity-75 text-center max-w-xs xl:max-w-sm font-light font-nunito">
-                Start Vibing With This World And Create New Friends
+                Start Vibing With This World And Create Friends
               </p>
 
               <div className="flex-col hidden min-[960px]:flex items-center gap-2">
